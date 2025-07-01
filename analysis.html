@@ -99,7 +99,7 @@ window.Quarto = {
 </header>
 
 
-<p>We are examining the heights of USMC recruits differing in sex so that we may determine uniforms for next year. The data was collected from a year ago and we are attempting to determine the average height of male and female USMC recruits. A potential weakness in our model is that the population and demographics of USMC recruits will vary from year to year, and because different demographics have different average heights, our predictions will never truly be accurate. We model height in USMC recruits, measured in centimeters for young adults aged 18–27 in the NHANES dataset, as a linear function of sex, a categorical variable with levels Female and Male. Specifically, the model estimates the average height for females (the baseline) and the additional height associated with being male.</p>
+<p>We are examining the heights of USMC recruits differing in sex so that we may determine uniforms for next year. The data was collected from a year ago and we are attempting to determine the average height of male and female USMC recruits. A potential weakness in our model is that the population and demographics of USMC recruits will vary from year to year, and because different demographics have different average heights, our predictions will never truly be accurate. We model height in USMC recruits, measured in centimeters for young adults aged 18–27 in the NHANES dataset, as a linear function of sex, a categorical variable with levels Female and Male. Specifically, the model estimates the average height for females (the baseline) and the additional height associated with being male. Based on the linear regression model, we estimate that young male recruits on average, are 15.94 cm taller than female recruits, with a 95% confidence interval of 12.32 cm to 19.56 cm, indicating the uncertainty in this height difference.</p>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 2 × 7
@@ -592,6 +592,15 @@ window.Quarto = {
 </tbody>
 </table>
 
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="analysis_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
 </div>
 </div>
 </div>
