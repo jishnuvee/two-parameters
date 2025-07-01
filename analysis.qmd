@@ -7,7 +7,7 @@ execute:
   echo: false
 ---
 
-We are examining the heights of USMC recruits differing in sex so that we may determine uniforms for next year. The data was collected from a year ago and we are attempting to determine the average height of male and female USMC recruits. A potential weakness in our model is that the population and demographics of USMC recruits will vary from year to year, and because different demographics have different average heights, our predictions will never truly be accurate. 
+We are examining the heights of USMC recruits differing in sex so that we may determine uniforms for next year. The data was collected from a year ago and we are attempting to determine the average height of male and female USMC recruits. A potential weakness in our model is that the population and demographics of USMC recruits will vary from year to year, and because different demographics have different average heights, our predictions will never truly be accurate. We model height in USMC recruits, measured in centimeters for young adults aged 18–27 in the NHANES dataset, as a linear function of sex, a categorical variable with levels Female and Male. Specifically, the model estimates the average height for females (the baseline) and the additional height associated with being male.
 
 
 
@@ -71,5 +71,29 @@ fit_height <- linear_reg() |>
 ```
 $$\hat{\text{height}} = 162.18 + 15.94 \cdot \text{sexMale}$$
 
+```{r}
 
+#| echo: true
+library(broom)
+library(gt)
+
+# Assuming fit_height is available from previous chunk
+# Create table with estimate and confidence intervals
+tidy(fit_height, conf.int = TRUE) |> 
+  select(term, estimate, conf.low, conf.high) |> 
+  gt() |> 
+  tab_header(title = "Linear Regression Model Coefficients") |> 
+  cols_label(
+    term = "Term",
+    estimate = "Estimate",
+    conf.low = "Lower CI",
+    conf.high = "Upper CI"
+  ) |> 
+  fmt_number(
+    columns = c(estimate, conf.low, conf.high),
+    decimals = 2
+  )
+
+
+```
 
