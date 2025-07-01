@@ -1,7 +1,141 @@
 ---
 title: "Two-Parameters"
+author : "Jishnu Veerapaneni"
+format: html
+
+execute: 
+  echo: false
 ---
 
-This is a Quarto website.
+We are examining the heights of USMC recruits differing in sex so that we may determine uniforms for next year. The data was collected from a year ago and we are attempting to determine the average height of male and female USMC recruits. A potential weakness in our model is that the population and demographics of USMC recruits will vary from year to year, and because different demographics have different average heights, our predictions will never truly be accurate. We model height in USMC recruits, measured in centimeters for young adults aged 18–27 in the NHANES dataset, as a linear function of sex, a categorical variable with levels Female and Male. Specifically, the model estimates the average height for females (the baseline) and the additional height associated with being male. Based on the linear regression model, we estimate that young male recruits on average, are 15.94 cm taller than female recruits, with a 95% confidence interval of 12.32 cm to 19.56 cm, indicating the uncertainty in this height difference.
 
-To learn more about Quarto websites visit <https://quarto.org/docs/websites>.
+
+
+
+```{r}
+#| message: false
+library(tidyverse)
+library(primer.data)
+library(tidymodels)
+library(broom)
+library(marginaleffects)
+```
+
+
+```{r}
+#| message: false
+set.seed(10)
+
+x <- nhanes |>
+  filter(age >= 18 & age <= 27) |>
+  select(height, sex) |>
+  drop_na() |>
+  slice_sample(n = 50) 
+
+```
+
+
+```{r}
+#| message: false
+library(tidymodels)
+fit_height <- linear_reg() |> 
+  set_engine("lm") |> 
+  fit(height ~ sex, data = x)
+
+
+```
+
+
+```{r}
+#| message: false
+linear_reg() |>
+fit(height ~ sex, data = x) |>
+tidy(conf.int = TRUE)
+```
+
+$$Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \cdots + \beta_n X_n + \epsilon$$
+
+with $\epsilon \sim \mathcal{N}(0, \sigma^2)$.
+
+
+```{r}
+#| message: false
+#| cache: true
+set.seed(10)
+nhanes |> 
+  filter(age >= 18 & age <= 27) |> 
+  select(height, sex) |> 
+  drop_na() |> 
+  slice_sample(n = 50) ->
+nhanes_subset
+
+fit_height <- linear_reg() |> 
+  set_engine("lm") |> 
+  fit(height ~ sex, data = nhanes_subset)
+
+```
+$$\hat{\text{height}} = 162.18 + 15.94 \cdot \text{sexMale}$$
+
+```{r}
+
+#| echo: false
+#| message: false
+library(broom)
+library(gt)
+
+# Assuming fit_height is available from previous chunk
+# Create table with estimate and confidence intervals
+tidy(fit_height, conf.int = TRUE) |> 
+  select(term, estimate, conf.low, conf.high) |> 
+  gt() |> 
+  tab_header(title = "Linear Regression Model Coefficients") |> 
+  cols_label(
+    term = "Term",
+    estimate = "Estimate",
+    conf.low = "Lower CI",
+    conf.high = "Upper CI"
+  ) |> 
+  fmt_number(
+    columns = c(estimate, conf.low, conf.high),
+    decimals = 2
+  )
+
+
+```
+
+```{r}
+#| echo: false
+#| message: false
+library(ggplot2)
+library(dplyr)
+
+# Assuming fit_height is available from previous chunk
+# Get predictions
+predictions <- plot_predictions(fit_height, condition = "sex", draw = FALSE)
+
+# Create plot
+ggplot(predictions, aes(x = sex, y = estimate, fill = sex)) +
+  geom_bar(stat = "identity", alpha = 0.8, width = 0.45) +
+  geom_errorbar(aes(ymin = conf.low, ymax = conf.high), width = 0.2, linewidth = 0.8) +
+  labs(
+    title = "Estimated Height by Sex for USMC recruits next year",
+    subtitle = "Males are approximately 12 cm taller than females on average",
+    caption = "Data source: NHANES (2009–2011), National Health and Nutrition Examination Survey",
+    x = "Sex",
+    y = "Estimated Height (cm)"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 14, hjust = 0.5),
+    plot.subtitle = element_text(size = 12, hjust = 0.5),
+    plot.caption = element_text(size = 10, hjust = 0),
+    axis.title = element_text(face = "bold", size = 12),
+    axis.text = element_text(size = 10),
+    legend.position = "none"
+  ) +
+  scale_fill_manual(values = c("Female" = "#F4A261", "Male" = "#2A9D8F"))
+```
+
+
+
+
