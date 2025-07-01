@@ -2,5 +2,74 @@
 title: "Two-Parameters"
 author : "Jishnu Veerapaneni"
 format: html
+
+execute: 
+  echo: false
 ---
+
+We are examining the heights of USMC recruits differing in sex so that we may determine uniforms for next year. The data was collected from a year ago and we are attempting to determine the average height of male and female USMC recruits. A potential weakness in our model is that the population and demographics of USMC recruits will vary from year to year, and because different demographics have different average heights, our predictions will never truly be accurate. 
+
+
+
+
+```{r}
+#| message: false
+library(tidyverse)
+library(primer.data)
+library(tidymodels)
+library(broom)
+```
+
+
+```{r}
+set.seed(10)
+
+x <- nhanes |>
+  filter(age >= 18 & age <= 27) |>
+  select(height, sex) |>
+  drop_na() |>
+  slice_sample(n = 50) 
+
+```
+
+
+```{r}
+library(tidymodels)
+fit_height <- linear_reg() |> 
+  set_engine("lm") |> 
+  fit(height ~ sex, data = x)
+
+
+```
+
+
+```{r}
+linear_reg() |>
+fit(height ~ sex, data = x) |>
+tidy(conf.int = TRUE)
+```
+
+$$Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \cdots + \beta_n X_n + \epsilon$$
+
+with $\epsilon \sim \mathcal{N}(0, \sigma^2)$.
+
+
+```{r}
+#| cache: true
+set.seed(10)
+nhanes |> 
+  filter(age >= 18 & age <= 27) |> 
+  select(height, sex) |> 
+  drop_na() |> 
+  slice_sample(n = 50) ->
+nhanes_subset
+
+fit_height <- linear_reg() |> 
+  set_engine("lm") |> 
+  fit(height ~ sex, data = nhanes_subset)
+
+```
+$$\hat{\text{height}} = 162.18 + 15.94 \cdot \text{sexMale}$$
+
+
 
